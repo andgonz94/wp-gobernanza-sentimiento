@@ -389,7 +389,7 @@ El `y_true` coincide en todos los casos: las diferencias están solo en las pred
 | baseline | +0.0259 | +0.0259 (mismo insumo) |
 | beto_sin_finetuning | +0.0161 | +0.0161 (mismo insumo) |
 
-La tabla de referencia de la prueba de aceptación (`CLAUDE.md`) corresponde a las
+La tabla de referencia de la prueba de aceptación corresponde a las
 corridas principales, no a este archivo.
 
 **Probable intención (verificado el 2026-10-08):** la semilla 2024 es, en ambos modelos,
@@ -405,7 +405,7 @@ Por tanto, el archivo no parece un error de copia: parece un bootstrap sobre una
 deben usarse como resultado principal: mezcla esa semilla con las corridas principales
 del baseline y de BETO sin ajuste fino, y la elección se hizo después de ver los
 resultados. El tratamiento de la variabilidad entre semillas corresponde al plan
-multisemilla (ver el anexo de `docs/prompt_claude_code_v2.md`). `[VERIFICAR]` que ningún documento haya
+multisemilla (fijado el 2026-10-08). `[VERIFICAR]` que ningún documento haya
 tomado cifras de él, en particular el p = 0.039 de BETO.
 
 ### Corrida principal identificada
@@ -553,7 +553,7 @@ BETO y RoBERTa son las de las corridas principales (SHA-256 `d70975…`/`98c943�
 
 Diferencia, IC y p bilateral idénticos sin redondeo entre `46216f2` y `HEAD`. Entorno
 congelado en `requirements-local.lock.txt` (Python 3.12.4). Nota: el registro muestra
-`PyMySQL==1.2.3`, no 2.2.8 como decía `CLAUDE.md`.
+`PyMySQL==1.2.3`, no 2.2.8 como decía la documentación interna.
 
 Con la versión `46216f2` también se registraron las métricas retiradas (solo como
 evidencia): `prop_remuestras_B_mejor` 0.805 / 0.954 / 0.101 / 0.732 y
@@ -1019,7 +1019,7 @@ regenerar.
 - Los prompts del 04 y del 07 nombran el programa; el anexo lo reemplaza por una marca.
 
 **Auditoría de privacidad del historial** (`scripts/19_auditoria_privacidad.py`,
-`docs/auditoria_privacidad.md`; solo lectura). Sin texto de estudiantes, sin nombres de
+su reporte no se publica; solo lectura). Sin texto de estudiantes, sin nombres de
 archivo de audio y sin nombres de institución educativa en ninguna versión publicada. Se
 encontró:
 

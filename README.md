@@ -33,7 +33,10 @@ historial de cambios. En la copia, los nombres de programa, de sesión y de luga
 aparecían en el código y en la documentación se reemplazaron por marcadores
 (`[PROGRAMA]`, `[PROGRAMA_1]`, `[PROGRAMA_2]`, `[SESION]`, `[LUGAR_O_NOMBRE]`). Esos valores solo afectan a la lectura de
 las rutas de los archivos de audio, a un nombre de columna y al texto de los prompts; la lógica
-del flujo es la misma. Se omitieron además las notas internas de trabajo de la auditoría.
+del flujo es la misma. Se omitieron además las notas internas de trabajo de la auditoría,
+y las referencias a ellas se reemplazaron por la fecha de la decisión correspondiente. Los
+identificadores de commit que citan los documentos de `docs/` remiten al historial del
+repositorio de trabajo, que no se publica.
 
 ## Entorno
 

@@ -6,7 +6,7 @@
 > que el código que se comparte en GitHub quede limpio y general, sin 
 > perder esta información para quien ejecute el pipeline.
 >
-> Referenciado desde `CLAUDE.md`. Cada vez que se limpie un script nuevo, 
+> Cada vez que se limpie un script nuevo, 
 > agregar su entrada aquí siguiendo el mismo formato.
 >
 > Los scripts en `scripts/colab/` no corren localmente: están escritos para
@@ -242,8 +242,6 @@ python scripts/historico/06_comparar_segmentacion.py --n 5
 
 **Decisión metodológica que motiva este script:** la comparación sobre una muestra de entrevistas (`historico/06_comparar_segmentacion.py`) mostró que el método de palabras clave (`historico/03_segmentar_entrevistas.py`) sobreparticionaba el texto (10.7 vs 6.7 segmentos promedio por entrevista, diferencia del 37%), comprometiendo la coherencia temática de las unidades de análisis exigida por el marco gobernado (Fase 3). La resegmentación con modelo de lenguaje se documenta como decisión de preparación de datos basada en evidencia empírica, no como sustitución del objetivo analítico. Los segmentos resultantes alimentan el etiquetado de sentimiento (`04_etiquetar_sentimiento.py`) y el modelado posterior.
 
-> Esta justificación vivía únicamente en el encabezado del script. `CLAUDE.md` referencia un `docs/decisiones_metodologicas.md` que no existe todavía en el repo — valdría la pena crear ese documento y trasladar esta decisión (y otras similares) ahí, con la estructura de qué/por qué/evidencia que pide el proyecto.
-
 **Requisitos previos:**
 - `ANTHROPIC_API_KEY` en `.env`.
 - Corpus cargado en la tabla `retroalimentacion` de MySQL.
@@ -267,7 +265,7 @@ Después de cargar, re-ejecutar `04_etiquetar_sentimiento.py --modo cargar` para
 
 ## `08_data_augmentation.py`
 
-**Qué hace:** genera variantes sintéticas por paráfrasis para las clases minoritarias (`negativo`, `neutral`) usando un modelo de lenguaje, e inserta cada variante de forma simétrica en ambas condiciones: texto íntegro en la condición gobernada, mismo texto con metadatos degradados en la condición cruda (misma lógica de `09_construir_condicion_a_segmentos.py`). Toda variante queda marcada con `es_sintetico=1` para trazabilidad — ver nota en `CLAUDE.md` sobre no mezclar datos sintéticos sin marcar.
+**Qué hace:** genera variantes sintéticas por paráfrasis para las clases minoritarias (`negativo`, `neutral`) usando un modelo de lenguaje, e inserta cada variante de forma simétrica en ambas condiciones: texto íntegro en la condición gobernada, mismo texto con metadatos degradados en la condición cruda (misma lógica de `09_construir_condicion_a_segmentos.py`). Toda variante queda marcada con `es_sintetico=1` para trazabilidad.
 
 **Historial de corrección (contenido antes en el encabezado del script, referenciado internamente como "v2"):**
 - La fuente ahora lee `segmento_retroalimentacion` filtrando `flag_excluir=0`, sobre el ground truth ya auditado (excluye el segmento 1806 por baja calidad de transcripción; el segmento 2441 quedó reclasificado a `neutral`).
@@ -370,7 +368,7 @@ Revisar el CSV y corregir manualmente los casos de confianza media/baja antes de
 
 ## `09a_procesar_condicion_a.py`
 
-**Qué hace:** procesa la Condición A (datos crudos sintéticos) a través del pipeline de gobernanza, simulando qué pasaría sin el marco gobernado: valida cada registro contra las reglas de calidad (RQ-01 a RQ-09, ver `CLAUDE.md` sección 3.3), registra cada violación en `detalle_error` y carga a `retroalimentacion` solo los registros que pasan, generando un reporte comparativo contra la Condición B.
+**Qué hace:** procesa la Condición A (datos crudos sintéticos) a través del pipeline de gobernanza, simulando qué pasaría sin el marco gobernado: valida cada registro contra las reglas de calidad (RQ-01 a RQ-09), registra cada violación en `detalle_error` y carga a `retroalimentacion` solo los registros que pasan, generando un reporte comparativo contra la Condición B.
 
 **Insumos esperados** (`outputs/`, generados por `05_construir_condicion_a.py`):
 - `condicion_A.csv`
@@ -518,7 +516,7 @@ python entrenar_roberta.py --modo completo   (o sin argumento, es el default)
 
 ## `colab/entrenar_roberta_multisemilla.py`
 
-**Qué hace:** reentrena BERTIN 5 veces por condición (semillas 42, 123, 2024, 7 y 99), variando solo la semilla, con 4 épocas fijas y sin repetir el k-fold. Reinicia la semilla justo antes de crear el modelo. Análisis de sensibilidad; ver el plan multisemilla en el anexo de `docs/prompt_claude_code_v2.md`.
+**Qué hace:** reentrena BERTIN 5 veces por condición (semillas 42, 123, 2024, 7 y 99), variando solo la semilla, con 4 épocas fijas y sin repetir el k-fold. Reinicia la semilla justo antes de crear el modelo. Análisis de sensibilidad del plan multisemilla fijado el 2026-10-08.
 
 **Advertencia:** El docstring y los mensajes de DIAGNOSTICO contienen interpretaciones escritas antes del análisis; no reflejan los resultados. Ver el plan multisemilla del 2026-10-08 y sus resultados.
 
@@ -730,7 +728,7 @@ python scripts/16_generar_graficos.py
 
 ## `14b_bootstrap_multisemilla.py`
 
-**Qué hace:** ejecuta el plan de análisis multisemilla fijado el 2026-10-08 (anexo de `docs/prompt_claude_code_v2.md`): bootstrap pareado por semilla (reutiliza el del 14), agregado descriptivo con prueba de signos, bootstrap de dos niveles (semillas y casos), Holm y criterio de robustez. Análisis de sensibilidad exploratorio.
+**Qué hace:** ejecuta el plan de análisis multisemilla fijado el 2026-10-08: bootstrap pareado por semilla (reutiliza el del 14), agregado descriptivo con prueba de signos, bootstrap de dos niveles (semillas y casos), Holm y criterio de robustez. Análisis de sensibilidad exploratorio.
 
 **Insumos:** `resultados_colab/{beto,roberta_es}/multisemilla/` (predicciones por semilla y `detalle_multisemilla.csv`) y `outputs/bootstrap_resultados.csv` (corrida principal, solo como referencia).
 

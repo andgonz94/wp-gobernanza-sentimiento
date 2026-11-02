@@ -59,8 +59,7 @@ El EMD depende solo de la variabilidad del diseño (tamaño del conjunto de
 prueba y dispersión de las predicciones), no del efecto observado. Se
 calcula sobre la misma distribución bootstrap (misma semilla y número de
 remuestreos), sin remuestreo adicional, de modo que la diferencia, el IC
-y el p bilateral no cambian. Decisión del 2026-10-07 (ver el anexo de
-docs/prompt_claude_code_v2.md).
+y el p bilateral no cambian. Decisión del 2026-10-07.
 
 Referencia sobre la potencia retrospectiva: Hoenig, J. M., & Heisey, D. M.
 (2001). The abuse of power: The pervasive fallacy of power calculations for
@@ -101,8 +100,8 @@ N_BOOTSTRAP = 5000
 SEMILLA = 42
 NIVEL_CONFIANZA = 0.95
 
-# Conjunto de exclusión del plan de sensibilidad a la fuga (2026-10-09, anexo de
-# docs/prompt_claude_code_v2.md): segmentos de prueba cuyo registro tiene un gemelo
+# Conjunto de exclusión del plan de sensibilidad a la fuga (2026-10-09): segmentos
+# de prueba cuyo registro tiene un gemelo
 # (entrevista con texto idéntico) con algún segmento o variante en entrenamiento.
 # Solo se usa con --excluir-fuga; el análisis principal no lo aplica.
 IDS_FUGA = frozenset([

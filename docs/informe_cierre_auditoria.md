@@ -3,7 +3,7 @@
 Auditoría del pipeline de la tesis "Efecto de un marco de gobernanza de datos sobre la
 calidad de un corpus de retroalimentación estudiantil y el desempeño de modelos de
 análisis de sentimiento". Detalle completo y evidencia en `docs/cambios_agosto_2026.md`
-(secciones citadas como §); plan y decisiones fechadas en `docs/prompt_claude_code_v2.md`.
+(secciones citadas como §).
 
 Principio aplicado: el código produjo resultados reportados. Primero se registró cada
 versión tal como existió y después se mejoró, en commits separados, sin mezclar formato
@@ -42,11 +42,11 @@ y lógica. Cada cambio de formato se verificó con `tools/verificar_equivalencia
 | Norma de estilo en todos los scripts (00-17, `colab/`, `config/`), verificada como equivalente | `c1f325f`, `fa91072`, `6f9b98a`, `4d1dbc2`, `9398e1f` |
 | Requisitos conciliados; `scipy` declarado; `openpyxl` opcional | `e87beaa`, `2eb401e` |
 | Trazabilidad de figuras y tablas (script 17, `manifiesto_figuras.csv`) | `7b050f6` |
-| `CLAUDE.md` consolidado; guía con orden de ejecución; `.gitignore` | `b0a0420`, `0a51665`, `329de07` |
+| Documentación de contexto consolidada; guía con orden de ejecución; `.gitignore` | `b0a0420`, `0a51665`, `329de07` |
 
 ## 3. Resultados que produjo la auditoría
 
-- **Análisis principal:** reproducido exactamente (ver `CLAUDE.md`, §7). Holm sobre las 4
+- **Análisis principal:** reproducido exactamente. Holm sobre las 4
   configuraciones: ningún p ajustado bajo 0.05.
 - **Multisemilla** (plan fijado antes de calcular, `2c39c91`): BETO y BERTIN favorecen a
   B en 5 de 5 semillas, pero el IC de dos niveles incluye cero (p Holm 0.134 en ambos):
@@ -98,7 +98,7 @@ y lógica. Cada cambio de formato se verificó con `tools/verificar_equivalencia
     variantes sintéticas no son reproducibles exactamente (§22; Anexo B).
 15. **Un nombre propio en el código publicado** (`01_deduplicar_y_cargar.py`) y nombres de
     programa y de sesión en código y bitácora; sin texto de estudiantes en el historial
-    (§22; `docs/auditoria_privacidad.md`).
+    (§22).
 
 ## 5. Pendiente para la autora (`[VERIFICAR]`)
 
@@ -108,8 +108,6 @@ y lógica. Cada cambio de formato se verificó con `tools/verificar_equivalencia
 - Qué catálogo de reglas describe el capítulo de Metodología.
 - Causa de los 4 registros sin segmentos y por qué `roberta_predicciones_{A,B}.csv` tiene
   ese nombre.
-- `docs/fase5_pendientes.md`, citado en la versión de junio de `CLAUDE.md`, no existe.
-  (`Briefing_Contexto_Proyecto.md` vive en el proyecto de claude.ai, no en el repositorio.)
 
 ## 5b. Sensibilidad a la fuga (plan del 2026-10-09)
 

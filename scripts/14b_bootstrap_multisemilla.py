@@ -1,7 +1,6 @@
 """Ejecuta el plan de análisis multisemilla de BETO y BERTIN (sensibilidad a la semilla).
 
-Implementa el plan fijado el 2026-10-08 en el anexo de
-docs/prompt_claude_code_v2.md (commit 2c39c91), antes de calcular cualquier
+Implementa el plan fijado el 2026-10-08, antes de calcular cualquier
 estadístico inferencial multisemilla. Es un análisis de sensibilidad
 exploratorio, posterior a los resultados principales del script 14: evalúa si
 la diferencia de F1-macro entre las condiciones B y A se sostiene al variar la

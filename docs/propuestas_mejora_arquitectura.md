@@ -108,5 +108,4 @@ Declarada en `requirements-local.txt` el 2026-10-08 (`e87beaa`).
 ## Métricas del bootstrap (resuelto)
 
 La propuesta de reemplazar `potencia_retrospectiva` por un análisis de efecto mínimo
-detectable se aprobó el 2026-10-07 (`ee_bootstrap` y `emd_80`; ver el anexo de
-`docs/prompt_claude_code_v2.md`). Se mantiene aquí como antecedente.
+detectable se aprobó el 2026-10-07 (`ee_bootstrap` y `emd_80`). Se mantiene aquí como antecedente.
