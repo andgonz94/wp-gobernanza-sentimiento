@@ -1,0 +1,12 @@
+RQ,Dimensión,Campo(s),Condición de fallo,Acción,Descripción
+RQ-01,Completitud,texto,texto IS NULL o vacío,Rechazar,Texto obligatorio. Sin él el registro no tiene valor analítico.
+RQ-02,Completitud,id_sesion,id_sesion IS NULL,Rechazar,Sin sesión el registro no puede contextualizarse.
+RQ-03,Completitud,fecha_registro,Fecha IS NULL,Rechazar,Fecha obligatoria para análisis longitudinal.
+RQ-04,Completitud,canal_captura,Canal IS NULL o vacío,Corregir → 'desconocido',Canal nulo: imputar 'desconocido' y documentar en bitácora.
+RQ-05,Validez,fecha_registro,Formato ≠ YYYY-MM-DD o futura,Rechazar,Fechas mal formadas o futuras indican error de captura.
+RQ-06,Validez,canal_captura,Valor fuera del catálogo,Corregir → 'desconocido',"Solo se aceptan: formulario, papel, app, email."
+RQ-07,Validez,etiqueta_sentimiento,Valor fuera del esquema,Rechazar,"Etiquetas fuera de {positivo, neutral, negativo} indican error de etiquetado."
+RQ-08,Unicidad,hash_texto + id_sesion,Hash+sesión ya existe,Rechazar,Duplicado detectado por hash MD5 del texto normalizado.
+RQ-09,Consistencia,texto,Longitud < 3 caracteres,Rechazar,"Textos muy cortos (ej. 'ok', 'sí') sin valor analítico."
+RQ-10,Consistencia,texto,Solo números/puntuación,Rechazar,El texto debe contener al menos una letra del alfabeto.
+RQ-11,Trazabilidad,id_ejecucion,Ausente al insertar,Rechazar,Todo registro debe estar vinculado a una ejecución del pipeline.

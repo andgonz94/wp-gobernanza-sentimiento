@@ -1,0 +1,10 @@
+codigo,campo,descripcion_09a,criterio_literal,accion,linea_09a,restriccion_esquema,violaciones_registradas,violaciones_corregidas
+RQ-01,texto,Texto nulo o vacío,if not texto:,rechazar el registro,74,"texto NOT NULL; CHECK (CHAR_LENGTH(texto) >= 5) (script 13, retroalimentacion)",9,9
+RQ-02,num_sesion (id_sesion),id_sesion nulo — registro no contextualizable,if pd.isna(id_sesion) or id_sesion is None:,rechazar el registro,88,id_sesion NOT NULL (script 13),50,50
+RQ-03,fecha_real (fecha_registro),fecha_registro nula,if pd.isna(fecha) or fecha is None:,rechazar el registro,93,fecha_registro NOT NULL (script 13),41,41
+RQ-04,canal_captura,canal_captura nulo,if pd.isna(canal) or canal is None:,rechazar el registro,104,canal_captura NOT NULL (script 13),20,16
+RQ-05,fecha_real (fecha_registro),fecha_registro con formato inválido (no ISO 8601),"pd.to_datetime(str(fecha), format=""%Y-%m-%d"") falla",rechazar el registro,98,tipo DATE de fecha_registro (parcial),10,10
+RQ-06,canal_captura,canal_captura fuera del catálogo definido,if str(canal).lower().strip() not in CANAL_CATALOGO:,rechazar el registro,108,CHECK canal_captura IN catálogo (script 13),13,17
+RQ-07,texto,Duplicado exacto o cuasi-duplicado detectado,texto_key = texto[:200].lower().strip(); if texto_key in textos_vistos,rechazar el registro,112,—,34,34
+RQ-08,texto,Texto no informativo sin valor analítico,if texto.lower().strip() in TEXTOS_NO_INFORMATIVOS:,rechazar el registro,79,—,12,12
+RQ-09,texto,Texto con longitud insuficiente (< 20 caracteres),if len(texto) < 20:,rechazar el registro,83,— (el CHECK de 5 caracteres no coincide con el umbral de 20),12,12

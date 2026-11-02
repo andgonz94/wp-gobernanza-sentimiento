@@ -1,0 +1,9 @@
+configuracion,condicion,n,f1_macro_recalculado,f1_macro_registrado,coincide
+baseline,A,177,0.444583,0.444583,True
+baseline,B,177,0.470483,0.470483,True
+beto_sin_finetuning,A,177,0.430386,0.430386,True
+beto_sin_finetuning,B,177,0.446437,0.446437,True
+beto,A,177,0.464841,0.464841,True
+beto,B,177,0.521898,0.521898,True
+bertin_roberta,A,177,0.510252,0.510252,True
+bertin_roberta,B,177,0.451625,0.451625,True

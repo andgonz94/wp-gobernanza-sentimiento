@@ -1,0 +1,14 @@
+etapa,criterio,unidad,efecto,ubicacion
+diseño,Longitud < 3 caracteres,registro,rechazar (RQ-09 de diseño),"Borradores/Working_Paper_Marco_Gobernado_v1.docx, tabla de reglas"
+código,if not texto or len(texto) < 5:,registro (carga de B),rechazar; RQ-01 en detalle_error,scripts/01_deduplicar_y_cargar.py:380
+código,if not texto or len(texto) < 5:,registro (carga de B),rechazar; RQ-01 en detalle_error,scripts/02_fusionar_y_cargar.py:237
+código,if len(texto) < 20:,registro (Condición A),rechazar; RQ-09,scripts/09a_procesar_condicion_a.py:83
+código,texto_key = texto[:200].lower().strip(),registro (Condición A),clave de duplicado RQ-07,scripts/09a_procesar_condicion_a.py:112
+código,AND LENGTH(texto) > 50,registro,solo se segmentan registros de más de 50 caracteres,scripts/07_resegmentar_corpus_completo.py:243
+código,texto_limitado = texto[:4000] if len(texto) > 4000 else texto,registro,solo los primeros 4.000 caracteres se envían a segmentar,scripts/07_resegmentar_corpus_completo.py:86
+código,if cat in CATEGORIAS and len(texto_s) >= 30:,segmento,se descartan fragmentos de menos de 30 caracteres,scripts/07_resegmentar_corpus_completo.py:106
+código,if not texto or len(texto.strip()) < 20:,segmento,excluir (flag_excluir),scripts/09_cargar_revision_manual.py:63
+código,if len(texto.split()) < 8:,segmento,excluir (menos de 8 palabras),scripts/09_cargar_revision_manual.py:67
+código,"return [v.strip() for v in variantes if isinstance(v, str) and len(v.strip()) >= 20]",variante sintética,se descartan variantes de menos de 20 caracteres,scripts/08_data_augmentation.py:91
+código,MAX_LENGTH   = 128,secuencia de tokens,"truncamiento al tokenizar (BETO, BERTIN)",scripts/colab/entrenar_beto.py:70
+esquema,(char_length(`texto`) >= 5),registro,MySQL rechaza la inserción,retroalimentacion.chk_texto_longitud (script 13)

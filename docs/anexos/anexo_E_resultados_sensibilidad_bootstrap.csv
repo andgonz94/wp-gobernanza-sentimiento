@@ -1,0 +1,5 @@
+modelo,f1_macro_B,f1_macro_A,diferencia_B_menos_A,ci95_low,ci95_high,p_valor_aprox,significativo_95,ee_bootstrap,emd_80,n_pares
+baseline,0.4056,0.385,0.0207,-0.0338,0.0748,0.4776,False,0.0274,0.0768,157
+beto,0.4733,0.4406,0.0328,-0.0344,0.1046,0.3612,False,0.035,0.0981,157
+bertin_roberta,0.4233,0.4992,-0.0759,-0.1789,0.0168,0.1064,False,0.0499,0.1398,157
+beto_sin_finetuning,0.4015,0.4011,0.0004,-0.0544,0.0533,0.9352,False,0.0276,0.0772,157

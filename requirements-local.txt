@@ -1,0 +1,38 @@
+# ============================================================
+# requirements-local.txt
+# Perfil LOCAL (MacBook, sin GPU): scripts 00-16 y validaciones.
+# NO incluye torch/transformers/datasets (esos viven en Colab).
+#
+# Paso 1 (ahora): instalar con estos rangos.
+# Paso 2 (tras validar que se reproducen los resultados):
+#         pip freeze > requirements-local.lock.txt
+#         -> ese .lock es el registro OFICIAL de versiones de la tesis.
+# ============================================================
+
+# Manipulación de datos
+pandas>=2.2,<3
+numpy>=1.26,<3
+
+# Métricas y modelos clásicos (baseline, f1_score del bootstrap)
+scikit-learn>=1.4,<2
+
+# Estadística: cuantiles normales del EMD (14) y prueba de signos (14b).
+# Se declara explícitamente aunque scikit-learn ya la instala.
+scipy>=1.11,<2
+
+# Gráficos (script 16 y figura del bootstrap)
+matplotlib>=3.8,<4
+
+# Conexión a MySQL (config/db_connection.py)
+SQLAlchemy>=2.0,<3
+PyMySQL>=1.1,<2
+cryptography>=42      # requerido por PyMySQL para autenticación caching_sha2 de MySQL 8
+python-dotenv>=1.0,<2
+
+# Opcional: solo si 09_cargar_revision_manual.py recibe un .xlsx (pandas.read_excel).
+# No forma parte del entorno validado; descomentar si se necesita.
+# openpyxl>=3.1,<4
+
+# Solo scripts 08 (augmentation). No se usa en validaciones; se deja
+# instalado para que los imports no fallen, pero NO ejecutar 08 sin intención.
+anthropic>=0.40

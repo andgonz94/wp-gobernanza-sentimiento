@@ -1,0 +1,3 @@
+modelo,n_semillas,media_dif,de_dif,min_dif,max_dif,semillas_B_mayor,semillas_A_mayor,p_signos_binomial,ic95_low_2niveles,ic95_high_2niveles,p_2niveles,p_2niveles_holm,dif_corrida_principal,signo_consistente,robusto_a_semilla
+beto,5,0.0391,0.0622,-0.016,0.1372,3,2,1.0,-0.0365,0.1179,0.2992,0.2992,0.0328,False,False
+bertin_roberta,5,0.0679,0.0382,0.0265,0.1085,5,0,0.0625,-0.0138,0.1417,0.0972,0.1944,-0.0759,True,False

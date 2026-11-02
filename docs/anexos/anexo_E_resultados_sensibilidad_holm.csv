@@ -1,0 +1,5 @@
+modelo,diferencia_B_menos_A,ci95_low,ci95_high,p_valor_aprox,p_holm
+baseline,0.0207,-0.0338,0.0748,0.4776,1.0
+beto,0.0328,-0.0344,0.1046,0.3612,1.0
+bertin_roberta,-0.0759,-0.1789,0.0168,0.1064,0.4256
+beto_sin_finetuning,0.0004,-0.0544,0.0533,0.9352,1.0

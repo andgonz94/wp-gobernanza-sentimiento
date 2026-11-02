@@ -1,0 +1,13 @@
+regla_diseno,regla_implementada,tipo_de_cambio,observacion
+RQ-01,RQ-01,sin cambio,"09a: texto vacío tras strip. Los cargadores de B (01, 02) la aplican como len(texto) < 5."
+RQ-02,RQ-02,sin cambio,"09a valida num_sesion, que es el id de sesión en el CSV de A."
+RQ-03,RQ-03,sin cambio,
+RQ-04,RQ-04,acción modificada,Diseño: corregir a 'desconocido'. 09a: rechazar.
+RQ-05,RQ-05,criterio modificado,09a solo verifica el formato %Y-%m-%d; no verifica fechas futuras.
+RQ-06,RQ-06,acción y criterio modificados,Diseño: corregir a 'desconocido'; catálogo sin 'desconocido'. 09a: rechazar; el catálogo incluye 'desconocido'.
+RQ-07,—,no implementada,"Etiqueta fuera de {positivo, neutral, negativo}: el esquema final tiene 5 clases. No es una regla del 09a; 04_etiquetar_sentimiento.py asigna 'neutral' a etiquetas no reconocidas, sin registrarlo (sin casos en la ejecución: 0 errores en etiquetas_cargar_20260519_1752.csv). El código RQ-07 se reutilizó para duplicados."
+RQ-08,RQ-07,renumerada y criterio modificado,"Diseño: hash MD5 del texto normalizado + id_sesion. 09a: primeros 200 caracteres en minúsculas, sin considerar la sesión. [VERIFICAR] emparejamiento."
+RQ-09,RQ-09,criterio modificado,Diseño: < 3 caracteres. 09a: < 20 caracteres.
+RQ-10,—,no implementada,Solo números o puntuación: ningún script lo verifica. [VERIFICAR] si RQ-08 o RQ-09 del 09a cubren la intención.
+RQ-11,—,no implementada como regla,"id_ejecucion obligatorio: 01, 02 y 09a siempre lo asignan al insertar (por construcción), pero ninguna regla lo valida y la columna admite NULL en el esquema."
+—,RQ-08,agregada,Texto no informativo (lista cerrada de expresiones). Sin equivalente en el diseño; [VERIFICAR] relación con RQ-10 de diseño.

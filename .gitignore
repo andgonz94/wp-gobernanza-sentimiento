@@ -1,0 +1,28 @@
+# Credenciales
+.env
+
+# Datos reales de estudiantes (raíz)
+Neutro.xml
+Opiniones.xml
+neutral.xml
+augmentation.csv
+negativo.xml.csv
+negativo_2.csv
+
+# Carpetas de datos (crudos y derivados)
+data/
+outputs/
+
+# macOS
+.DS_Store
+Icon?
+
+# Python
+__pycache__/
+*.pyc
+
+# Entorno y herramientas locales
+.venv/
+.claude/settings.local.json
+.Rhistory
+insumos_colab/

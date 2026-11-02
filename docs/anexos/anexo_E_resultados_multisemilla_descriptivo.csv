@@ -1,0 +1,5 @@
+modelo,condicion,n_semillas,log_loss_media,log_loss_de,pr_auc_media,pr_auc_de
+beto,A,5,1.163,0.0273,0.5318,0.0366
+beto,B,5,1.0927,0.0354,0.5764,0.0246
+bertin_roberta,A,5,1.2174,0.0615,0.4926,0.0369
+bertin_roberta,B,5,1.1355,0.0595,0.5669,0.0462

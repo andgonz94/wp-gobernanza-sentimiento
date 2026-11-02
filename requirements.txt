@@ -1,0 +1,19 @@
+# requirements.txt
+#
+# Conciliado el 2026-10-08. Los requisitos se organizan por perfil:
+#   - requirements-local.txt       rangos del perfil local (scripts 00-16, tools/).
+#   - requirements-local.lock.txt  versiones exactas que superaron la prueba de
+#                                  aceptación del 2026-10-08 (registro oficial).
+#   - Colab (torch, transformers, datasets): sin archivo de requisitos; las
+#     versiones de los entrenamientos de agosto no se registraron (ver
+#     docs/propuestas_mejora_arquitectura.md).
+#
+# Versión anterior (commit inicial 788f4ff), sin uso desde que existe el perfil local:
+#   mysql-connector-python==8.3.0  -> retirado: ningún script lo importa
+#                                     (la conexión usa SQLAlchemy + PyMySQL).
+#   python-dotenv==1.0.1, pandas==2.2.2, sqlalchemy==2.0.30, pymysql==1.1.1
+#                                  -> sustituidos por los rangos del perfil local.
+#
+# Instalación reproducible:  pip install -r requirements-local.lock.txt
+
+-r requirements-local.txt
