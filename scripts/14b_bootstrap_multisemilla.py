@@ -25,6 +25,14 @@ Salidas (outputs/multisemilla/):
     bootstrap_por_semilla.csv, agregado_por_modelo.csv,
     holm_configuraciones_principales.csv, descriptivo_logloss_prauc.csv,
     manifiesto_insumos_multisemilla.csv.
+    Con --por-entrevista y --excluir-fuga, las mismas tablas en
+    outputs/multisemilla{_por_entrevista}{_sin_fuga}/, a partir de
+    outputs/bootstrap_resultados{_por_entrevista}{_sin_fuga}.csv.
+
+NOTA METODOLÓGICA (2026-11-02): con --por-entrevista, el bootstrap por semilla y el
+segundo nivel del bootstrap de dos niveles remuestrean entrevistas únicas por contenido
+(grupos_por_entrevista del script 14) en lugar de segmentos. Sin la opción, el script se
+comporta exactamente como antes.
 """
 
 import argparse
@@ -134,7 +142,8 @@ def holm(p_valores):
     return ajustados.tolist()
 
 
-def bootstrap_dos_niveles(y_true, preds_a, preds_b, n_replicas=N_REPLICAS, semilla=SEMILLA_BOOTSTRAP):
+def bootstrap_dos_niveles(y_true, preds_a, preds_b, n_replicas=N_REPLICAS, semilla=SEMILLA_BOOTSTRAP,
+                          grupos=None):
     """Estima la distribución de la media de Δ remuestreando semillas y casos.
 
     En cada réplica se sortean primero las semillas (con reemplazo) y después los
@@ -147,16 +156,24 @@ def bootstrap_dos_niveles(y_true, preds_a, preds_b, n_replicas=N_REPLICAS, semil
         preds_b (numpy.ndarray): Predicciones de B, forma (n_semillas, n_casos).
         n_replicas (int): Número de réplicas bootstrap.
         semilla (int): Semilla del generador aleatorio.
+        grupos (numpy.ndarray | None): Si se indica, en el segundo nivel se sortean grupos
+            (entrevistas) y sus casos entran juntos; si es None, se sortean casos, como antes.
 
     Returns:
         numpy.ndarray: Media de Δ F1-macro en cada réplica.
     """
     rng = np.random.default_rng(semilla)
     n_semillas, n_casos = preds_a.shape
+    if grupos is not None:
+        _, codigos = np.unique(grupos, return_inverse=True)
+        miembros = [np.flatnonzero(codigos == g) for g in range(codigos.max() + 1)]
     medias = np.empty(n_replicas)
     for r in range(n_replicas):
         idx_semillas = rng.integers(0, n_semillas, size=n_semillas)
-        idx_casos = rng.integers(0, n_casos, size=n_casos)
+        if grupos is None:
+            idx_casos = rng.integers(0, n_casos, size=n_casos)
+        else:
+            idx_casos = np.concatenate([miembros[g] for g in rng.integers(0, len(miembros), size=len(miembros))])
         yt = y_true[idx_casos]
         # Se calcula una vez por semilla distinta y se pondera por su frecuencia
         # en el sorteo: equivale a promediar sobre las 5 semillas sorteadas.
@@ -178,16 +195,20 @@ def main():
     parser.add_argument("--excluir-fuga", action="store_true",
                         help="excluye el conjunto de fuga (plan del 2026-10-09); salidas en "
                              "outputs/multisemilla_sin_fuga/")
+    parser.add_argument("--por-entrevista", action="store_true",
+                        help="remuestrea entrevistas únicas por contenido en lugar de segmentos "
+                             "(plan del 2026-11-02); salidas en outputs/multisemilla_por_entrevista*/")
     args = parser.parse_args()
     origen = args.origen_colab.expanduser().resolve()
 
     s14 = cargar_script_14()
     # Con --excluir-fuga se usan el conjunto de exclusión del 14, sus resultados sin fuga
     # y una carpeta de salida separada; sin la opción, todo queda como en el plan original.
+    # --por-entrevista agrega el sufijo _por_entrevista a la carpeta y a los resultados del 14.
     excluir = s14.IDS_FUGA if args.excluir_fuga else frozenset()
-    out_dir = Path("outputs/multisemilla_sin_fuga") if args.excluir_fuga else OUT_DIR
-    resultados_principales = (Path("outputs/bootstrap_resultados_sin_fuga.csv")
-                              if args.excluir_fuga else RESULTADOS_PRINCIPALES)
+    sufijo = ("_por_entrevista" if args.por_entrevista else "") + ("_sin_fuga" if args.excluir_fuga else "")
+    out_dir = Path(f"outputs/multisemilla{sufijo}")
+    resultados_principales = Path(f"outputs/bootstrap_resultados{sufijo}.csv")
     out_dir.mkdir(parents=True, exist_ok=True)
     if (s14.N_BOOTSTRAP, s14.SEMILLA) != (N_REPLICAS, SEMILLA_BOOTSTRAP):
         print(f"[AVISO] El script 14 usa {s14.N_BOOTSTRAP} remuestreos y semilla {s14.SEMILLA}; "
@@ -204,12 +225,16 @@ def main():
             df_a, df_b = cargar_predicciones(origen, carpeta, semilla, manifiesto, excluir)
             if y_true_ref is None:
                 y_true_ref, ids_ref = df_a["y_true"].to_numpy(), df_a["id_segmento"]
+                grupos = s14.grupos_por_entrevista(ids_ref) if args.por_entrevista else None
+                if grupos is not None:
+                    print(f"  [INFO] Remuestreo por entrevista: {len(np.unique(grupos))} entrevistas "
+                          f"únicas para {len(ids_ref)} segmentos.")
             elif not (df_a["id_segmento"].equals(ids_ref) and np.array_equal(df_a["y_true"], y_true_ref)):
                 raise ValueError(f"{modelo} s{semilla}: el conjunto de prueba difiere entre semillas")
             preds_a.append(df_a["y_pred"].to_numpy())
             preds_b.append(df_b["y_pred"].to_numpy())
 
-            resultado, _ = s14.bootstrap_pareado(df_a, df_b)
+            resultado, _ = s14.bootstrap_pareado(df_a, df_b, grupos=grupos)
             resultado.update({"modelo": modelo, "semilla": semilla})
             filas_semilla.append(resultado)
             print(f"  s{semilla:<5} Δ {resultado['diferencia_B_menos_A']:+.4f}  "
@@ -224,7 +249,7 @@ def main():
 
         # --- Paso c: bootstrap de dos niveles ---
         print(f"  [INFO] Bootstrap de dos niveles: {N_REPLICAS} réplicas...")
-        medias = bootstrap_dos_niveles(y_true_ref, np.vstack(preds_a), np.vstack(preds_b))
+        medias = bootstrap_dos_niveles(y_true_ref, np.vstack(preds_a), np.vstack(preds_b), grupos=grupos)
         ic_low, ic_high = np.percentile(medias, [100 * ALFA / 2, 100 * (1 - ALFA / 2)])
 
         filas_agregado.append({

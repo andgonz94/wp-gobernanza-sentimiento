@@ -41,6 +41,7 @@ Orden real reconstruido el 2026-10-08 a partir de las fechas de los archivos de 
 | 10 | `08_data_augmentation.py` (o su recarga desde CSV) | tabla `augmentation_segmentos` (2026-08-05 23:00) | 8 |
 | 11 | `10_split_train_test.py` | tabla `split_asignacion` (2026-08-06 00:26) | 9 y 10 |
 | 12 | `11_entrenar_baseline.py` | `predicciones_{A,B}_baseline.csv` (2026-08-12 15:42) | 11 |
+| 12b | `11b_baseline_vectorizador_por_condicion.py` | `outputs/sensibilidad_vectorizador/` (2026-11-02) | 11 y 16 |
 | 13 | `12_exportar_tablas_para_colab.py` → `colab/` | corridas principales de Colab (2026-08-12 a 2026-08-28) | 11 |
 | 14 | `13_agregar_constraints_esquema.py` | respaldo y reconstrucción de `retroalimentacion` (2026-08-31 23:24). Ya aplicado; no reejecutar | 2 |
 | 15 | `13b_preparar_insumos_validacion.py` | `manifiesto_insumos.csv` | 12 y 13 |
@@ -443,6 +444,20 @@ python scripts/11_entrenar_baseline.py
 
 ---
 
+## `11b_baseline_vectorizador_por_condicion.py`
+
+**Qué hace:** análisis de sensibilidad del baseline (plan del 2026-11-02). Repite el TF-IDF con regresión logística con un vectorizador ajustado sobre el entrenamiento de cada condición, en lugar del único ajustado sobre B del script 11, y estima Δ con `bootstrap_pareado` del 14, por segmento y por entrevista, con y sin el conjunto de fuga. Reutiliza la carga, la construcción de conjuntos y el conjunto comparable del 11. Antes de calcular, verifica que con el vectorizador único reproduce las predicciones originales (`outputs/bootstrap_input/baseline_predicciones_{A,B}.csv`); si no, se detiene. El resultado principal del baseline sigue siendo el del 11.
+
+**Salidas** (`outputs/sensibilidad_vectorizador/`): `predicciones_{A,B}_baseline.csv` y `bootstrap_resultados.csv`.
+
+**Uso:**
+```
+python scripts/11b_baseline_vectorizador_por_condicion.py --modo preview    # verifica y muestra, no escribe
+python scripts/11b_baseline_vectorizador_por_condicion.py --modo completo
+```
+
+---
+
 ## `12_exportar_tablas_para_colab.py`
 
 **Qué hace:** exporta a CSV las tablas necesarias para el ajuste fino de BETO y RoBERTa-es en Google Colab, donde no hay acceso directo a la base MySQL local: `split_asignacion`, `segmento_retroalimentacion` (solo columnas necesarias, `flag_excluir=0`), `segmento_condicion_a` y `augmentation_segmentos`.
@@ -639,6 +654,8 @@ Los insumos los organiza `13b_preparar_insumos_validacion.py`; no copiarlos a ma
 python scripts/14_bootstrap_pareado.py
 ```
 
+**Bootstrap por entrevista (inferencia principal desde el 2026-11-02):** `python scripts/14_bootstrap_pareado.py --por-entrevista` (y con `--excluir-fuga` para la sensibilidad). Remuestrea entrevistas únicas por contenido (`grupos_por_entrevista`: el `id_registro` de cada segmento, con los 17 pares de texto idéntico unidos en un solo grupo; lee la BD) en lugar de segmentos. Escribe `outputs/bootstrap_resultados_por_entrevista{,_sin_fuga}.csv` y su figura, con la columna adicional `n_entrevistas` (30 en n = 177; 25 en n = 157). El remuestreo por segmento queda como comparación; sin la opción, el script reproduce exactamente sus salidas anteriores.
+
 ---
 
 ## `15_analisis_errores.py`
@@ -725,6 +742,8 @@ python scripts/14b_bootstrap_multisemilla.py --origen-colab "<ruta a resultados_
 ```
 
 **Sensibilidad a la fuga:** `python scripts/14_bootstrap_pareado.py --excluir-fuga` y después `python scripts/14b_bootstrap_multisemilla.py --origen-colab "<ruta>" --excluir-fuga`. Excluyen los 22 segmentos de `IDS_FUGA` y escriben en `outputs/bootstrap_resultados_sin_fuga.csv`, `outputs/bootstrap_distribuciones_sin_fuga.png` y `outputs/multisemilla_sin_fuga/`, sin tocar las salidas principales.
+
+**Por entrevista:** con `--por-entrevista` (después de `14 --por-entrevista`), el bootstrap por semilla y el segundo nivel del bootstrap de dos niveles remuestrean entrevistas; escribe en `outputs/multisemilla_por_entrevista{,_sin_fuga}/`.
 
 ---
 

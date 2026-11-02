@@ -72,6 +72,15 @@ Entradas:
 Salidas:
     outputs/bootstrap_resultados.csv: resumen por configuración.
     outputs/bootstrap_distribuciones.png: distribuciones bootstrap con el IC.
+    Con --excluir-fuga y --por-entrevista, los mismos archivos con sufijos _sin_fuga y
+    _por_entrevista.
+
+NOTA METODOLÓGICA (2026-11-02): con --por-entrevista el remuestreo se hace sobre
+entrevistas únicas por contenido (los 17 pares de texto idéntico cuentan como una sola),
+de modo que los segmentos de una misma entrevista entran o salen juntos. Es la inferencia
+principal del plan del 2026-11-02; el remuestreo por segmento, que no tiene en cuenta la
+dependencia entre segmentos de una entrevista, queda como comparación. Sin la opción, el
+script se comporta exactamente como antes (mismos remuestreos y mismas salidas).
 """
 
 import argparse
@@ -156,7 +165,38 @@ def cargar_par(archivo_a, archivo_b):
     return df_a, df_b
 
 
-def bootstrap_pareado(df_a, df_b, n_bootstrap=N_BOOTSTRAP, semilla=SEMILLA):
+def grupos_por_entrevista(ids_segmento):
+    """Asigna a cada segmento su entrevista única por contenido (plan del 2026-11-02).
+
+    El grupo es el id_registro del segmento; los dos registros de cada par de texto
+    idéntico (17 pares) forman un solo grupo, identificado por el id_registro menor.
+    Solo lectura de la base de datos.
+
+    Args:
+        ids_segmento (array-like): id_segmento de los casos, en el orden del análisis.
+
+    Returns:
+        numpy.ndarray: Identificador de grupo de cada caso, en el mismo orden.
+    """
+    import sys
+    sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+    from config.db_connection import get_engine
+    engine = get_engine()
+    registro = pd.read_sql("SELECT id_segmento, id_registro FROM segmento_retroalimentacion",
+                           engine).set_index("id_segmento")["id_registro"]
+    pares = pd.read_sql("""
+        SELECT r1.id_registro AS primero, r2.id_registro AS segundo
+        FROM retroalimentacion r1
+        JOIN retroalimentacion r2
+          ON r1.texto = r2.texto AND r1.id_registro < r2.id_registro
+        WHERE r1.id_ejecucion = 2 AND r2.id_ejecucion = 2
+    """, engine)
+    gemelo = dict(zip(pares["segundo"], pares["primero"]))
+    registros = registro.loc[list(ids_segmento)].to_numpy()
+    return np.array([gemelo.get(r, r) for r in registros])
+
+
+def bootstrap_pareado(df_a, df_b, n_bootstrap=N_BOOTSTRAP, semilla=SEMILLA, grupos=None):
     """Estima por bootstrap pareado la diferencia de F1-macro entre dos condiciones.
 
     Args:
@@ -164,12 +204,17 @@ def bootstrap_pareado(df_a, df_b, n_bootstrap=N_BOOTSTRAP, semilla=SEMILLA):
         df_b (pandas.DataFrame): Predicciones de la condición gobernada.
         n_bootstrap (int): Número de remuestreos a realizar.
         semilla (int): Semilla del generador de números aleatorios, para reproducibilidad.
+        grupos (numpy.ndarray | None): Si se indica, se remuestrean grupos (entrevistas) con
+            reemplazo y sus casos entran juntos; si es None, se remuestrean casos, como antes.
 
     Returns:
         tuple: Diccionario de métricas resumen y arreglo con la distribución bootstrap de diferencias.
     """
     rng = np.random.default_rng(semilla)
     n = len(df_a)
+    if grupos is not None:
+        _, codigos = np.unique(grupos, return_inverse=True)
+        miembros = [np.flatnonzero(codigos == g) for g in range(codigos.max() + 1)]
 
     y_true_a = df_a["y_true"].values
     y_pred_a = df_a["y_pred"].values
@@ -182,7 +227,10 @@ def bootstrap_pareado(df_a, df_b, n_bootstrap=N_BOOTSTRAP, semilla=SEMILLA):
 
     diffs = np.empty(n_bootstrap)
     for i in range(n_bootstrap):
-        idx = rng.integers(0, n, size=n)  # remuestreo CON reemplazo, MISMOS índices para A y B
+        if grupos is None:
+            idx = rng.integers(0, n, size=n)  # remuestreo CON reemplazo, MISMOS índices para A y B
+        else:  # remuestreo de entrevistas: los casos de cada entrevista sorteada entran juntos
+            idx = np.concatenate([miembros[g] for g in rng.integers(0, len(miembros), size=len(miembros))])
         f1_a_boot = f1_score(y_true_a[idx], y_pred_a[idx], average="macro", zero_division=0)
         f1_b_boot = f1_score(y_true_b[idx], y_pred_b[idx], average="macro", zero_division=0)
         diffs[i] = f1_b_boot - f1_a_boot
@@ -226,8 +274,11 @@ def main():
     parser = argparse.ArgumentParser(description="Bootstrap pareado de la diferencia de F1-macro B − A.")
     parser.add_argument("--excluir-fuga", action="store_true",
                         help="excluye el conjunto de fuga (plan del 2026-10-09); salidas *_sin_fuga")
+    parser.add_argument("--por-entrevista", action="store_true",
+                        help="remuestrea entrevistas únicas por contenido en lugar de segmentos "
+                             "(plan del 2026-11-02); salidas *_por_entrevista")
     args = parser.parse_args()
-    sufijo = "_sin_fuga" if args.excluir_fuga else ""
+    sufijo = ("_por_entrevista" if args.por_entrevista else "") + ("_sin_fuga" if args.excluir_fuga else "")
     if not IN_DIR.exists():
         print(f"[ERROR] No existe la carpeta {IN_DIR}. Consulta docs/guia_operativa_scripts.md "
               f"para la estructura y los nombres de archivo esperados.")
@@ -250,8 +301,14 @@ def main():
                   f"segmentos; quedan {int(conservar.sum())}.")
             df_a = df_a[conservar].reset_index(drop=True)
             df_b = df_b[conservar].reset_index(drop=True)
-        resultado, diffs = bootstrap_pareado(df_a, df_b)
+        grupos = grupos_por_entrevista(df_a["id_segmento"]) if args.por_entrevista else None
+        if grupos is not None:
+            print(f"  [INFO] Remuestreo por entrevista: {len(np.unique(grupos))} entrevistas "
+                  f"únicas para {len(df_a)} segmentos.")
+        resultado, diffs = bootstrap_pareado(df_a, df_b, grupos=grupos)
         resultado["modelo"] = nombre_modelo
+        if grupos is not None:
+            resultado["n_entrevistas"] = len(np.unique(grupos))
         resultados.append(resultado)
         distribuciones[nombre_modelo] = diffs
 
@@ -276,7 +333,7 @@ def main():
     df_resultados = pd.DataFrame(resultados)[
         ["modelo", "f1_macro_B", "f1_macro_A", "diferencia_B_menos_A",
          "ci95_low", "ci95_high", "p_valor_aprox", "significativo_95",
-         "ee_bootstrap", "emd_80", "n_pares"]
+         "ee_bootstrap", "emd_80", "n_pares"] + (["n_entrevistas"] if args.por_entrevista else [])
     ]
     ruta_csv = OUT_DIR / f"bootstrap_resultados{sufijo}.csv"
     df_resultados.to_csv(ruta_csv, index=False)
