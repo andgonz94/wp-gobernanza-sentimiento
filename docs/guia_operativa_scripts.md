@@ -324,7 +324,7 @@ Para comparar A y B segmento a segmento, "texto idéntico" se determina comparan
 
 > Nota: el Documento de Trabajo (sección 8) formuló el principio como identidad estricta del contenido textual; la implementación lo precisa como se describe aquí. Desviación declarada en el capítulo de Metodología, sección 3.1.
 
-**Proporciones replicadas de `auditoria_inyeccion.csv`** (152 registros originales → 88 afectados, 126 errores, 57.9% tasa de afectación):
+**Proporciones replicadas de `auditoria_inyeccion.csv`**, el registro de los 126 defectos inyectados por el script 05 con las tasas fijadas en el diseño (no son defectos observados en las transcripciones). La tasa de afectación de los segmentos (57.9%) es un parámetro de diseño:
 - `nulo_id_sesion` 18.25% · `nulo_canal` 14.29% · `canal_fuera_catalogo` 13.49%
 - `nulo_fecha` 11.90% · `formato_fecha` 11.11%
 - `duplicado_exacto` 9.52% · `texto_no_informativo` 9.52%

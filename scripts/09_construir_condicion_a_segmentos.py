@@ -1,7 +1,7 @@
 """Construye la versión segmentada de la condición cruda inyectando defectos de calidad.
 
-Parte de los segmentos de la condición gobernada y replica las proporciones de
-error observadas en la auditoría del corpus original. Un mismo segmento puede
+Parte de los segmentos de la condición gobernada y replica la composición de los
+126 defectos inyectados en los registros (script 05). Un mismo segmento puede
 recibir más de un defecto. La mayoría de los defectos afectan metadatos,
 validaciones o trazabilidad; tres alteran el texto del segmento (nulo_texto,
 texto_no_informativo y cuasi_duplicado; ver docs/guia_operativa_scripts.md).
@@ -24,7 +24,7 @@ SEMILLA = 42  # reproducibilidad — misma semilla siempre = mismos segmentos af
 
 # --- DISTRIBUCIÓN DE DEFECTOS (proporcional a auditoria_inyeccion.csv) ---
 
-TASA_AFECTACION = 0.579  # 88/152 registros originales tenían al menos 1 error
+TASA_AFECTACION = 0.579  # parámetro de diseño; calculado como 88/152 a partir del registro de inyección
 
 DISTRIBUCION_ERRORES = {
     "nulo_id_sesion"      : 0.1825,
